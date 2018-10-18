@@ -1,0 +1,15 @@
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app-node
+  namespace: desafio-devops
+spec:
+  rules:
+    - host: app-node.meusite.com.br
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: app-node
+              servicePort: 3000

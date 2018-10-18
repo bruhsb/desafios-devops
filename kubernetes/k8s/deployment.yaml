@@ -1,0 +1,55 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: app-desafio-devops
+  namespace: desafio-devops
+  labels:
+    app: app_node
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: app_node
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        ########### Container da App ###########
+        - name: app
+          image: node-app:0.2
+          imagePullPolicy: Never
+          command: ["npm", "start"]
+          ports:
+          - containerPort: 3000
+
+          readinessProbe: # Read-Check
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe: #Health-Check
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+          env:
+          - name: NAME
+            value: "Bruno S. Brasil"
+
+          volumeMounts:
+            - name: timezone-config
+              mountPath: /etc/localtime
+        #########################################
+        
+      volumes:
+      - name: timezone-config
+        hostPath:
+           path: /usr/share/zoneinfo/America/Sao_Paulo
