@@ -3,4 +3,5 @@ WORKDIR /src
 COPY app/ .
 RUN npm install --quiet
 EXPOSE 3000
-CMD npm start
+USER 1000
+CMD ["npm", "start"]
