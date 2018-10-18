@@ -1,0 +1,68 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "app-desafio-devops.fullname" . }}
+  namespace: {{ .Values.namespace}}
+  labels:
+    app: {{ template "app-desafio-devops.name" . }}
+    chart: {{ template "app-desafio-devops.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: {{ template "app-desafio-devops.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "app-desafio-devops.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      # volumes:
+      # - name: timezone-config
+      #   hostPath: /usr/share/zoneinfo/America/Sao_Paulo
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: {{ .Values.ports.name }}
+              containerPort: {{ .Values.ports.containerPort }}
+              protocol: {{ .Values.ports.protocol }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.ports.name }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.ports.name }}
+          env:
+          - name: NAME
+            value: {{ .Values.env.NAME }}
+          # volumeMounts:
+          #   - name: timezone-config
+          #     mountPath: /etc/localtime
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

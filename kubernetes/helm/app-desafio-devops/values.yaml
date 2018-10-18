@@ -1,0 +1,55 @@
+
+########## Deployment ##########
+
+replicaCount: 3
+
+namespace: desafio-devops
+
+image:
+  repository: node-app
+  tag: 0.2
+  pullPolicy: Never
+
+env:
+  NAME: Bruno
+
+resources:
+  limits:
+   cpu: 100m
+   memory: 128Mi
+  requests:
+   cpu: 100m
+   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ports:
+  name: nodejs
+  containerPort: 3000
+  protocol: TCP
+
+########## Service ##########
+
+service:
+  type: NodePort
+  port: 80
+
+########## Ingress ##########
+
+ingress:
+  enabled: true
+  namePort: nodejs
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - app-node.meusite.com.br
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
