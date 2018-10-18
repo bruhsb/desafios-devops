@@ -55,7 +55,7 @@ terraform init
 ```
 ![terraform](../images/image-01.png)
 
-2.  Revise todo a implementação:
+2.  Revise toda a implementação:
 ```bash
 terraform plan -var 'foo=bar'
 ```
