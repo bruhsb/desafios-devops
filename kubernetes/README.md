@@ -90,6 +90,8 @@ kubectl -n desafio-devops create -Rf ./k8s
 Aguarde cerca de 5 minutos para que o Ingress disponibilize um IP.
 A aplicação responde a um DNS específico (**app-node.meusite.com.br**). Utilizando o comando abaixo é possível configurar o acesso da aplicação no DNS local.
 
+![terraform](../images/image-03.png)
+
 ```bash
 sudo echo "$(kubectl -n desafio-devops get ing -o jsonpath='{.items[*].spec.rules[0].host}') $(kubectl -n desafio-devops get ing -o jsonpath='{.items[*].status.loadBalancer.ingress[0].ip}')" >> /etc/hosts
 ```
