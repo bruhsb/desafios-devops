@@ -1,3 +1,23 @@
+# desiredReplicas = ceil[currentReplicas * ( currentMetricValue / desiredMetricValue )]
+
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-desafio-devops
+  namespace: desafio-devops
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app-desafio-devops
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: CPU
+      targetAverageUtilization: 50
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -7,11 +27,11 @@ metadata:
   labels:
     app: app_node
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 2
+      maxSurge: 1
       maxUnavailable: 0
   template:
     metadata:
@@ -23,8 +43,8 @@ spec:
       containers:
         ########### Container da App ###########
         - name: app
-          image: node-app:0.2
-          imagePullPolicy: Never
+          image: gcr.io/idwall-sandbox/node-app:0.4
+          imagePullPolicy: Always
           command: ["npm", "start"]
           ports:
           - containerPort: 3000
@@ -40,15 +60,25 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 20
 
+          # resources:
+          #   limits:
+          #     cpu: 100m
+          #     memory: 70Mi
+          #   requests:
+          #     cpu: 60m
+          #     memory: 60Mi
+
           env:
           - name: NAME
             value: "Bruno S. Brasil"
+          - name: NUMBER
+            value: "5000000"
 
           volumeMounts:
             - name: timezone-config
               mountPath: /etc/localtime
         #########################################
-        
+
       volumes:
       - name: timezone-config
         hostPath:
